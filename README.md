@@ -19,8 +19,6 @@
 
 ### Singleton
 ```csharp
-var container = Container.Create();
-
 public interface IFoo
 {
 }
@@ -28,6 +26,8 @@ public interface IFoo
 public class Foo : IFoo
 {
 }
+
+var container = Container.Create();
 
 container
   .Bind<IFoo>() // Specify the service type
@@ -70,7 +70,7 @@ container.Bind<Foo>().ToNew().AsCached().OnInstall();
 container.Bind<Bar>().ToNew().AsCached().OnInstall();
 
 container.Install();
-// "DoFooThings" is printed 
+// "DoFooThings" is printed as Bar is resolved on install which triggers the Initialize-Callback
 ```
 
 ### Factories
