@@ -18,7 +18,7 @@ namespace Wynn.DI
         {
             _bindingToObject = new Dictionary<Binding, object>();
             Cache = new ContainerCache();
-            CreateBinding().Bind<IContainerResolver>().ToConstant(this).AsCached().OnResolve();
+            CreateBinding().Bind<IContainerResolver>().ToConstant(this).AsCached().OnRequest();
         }
 
         private IBindingService CreateBinding()

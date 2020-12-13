@@ -118,14 +118,14 @@ namespace Wynn.DI
         public IBindingScopeOnResolve AsTransient()
         {
             Resolution = BindingResolution.AsTransient;
-            _container.Bind(BindingHelper.CreateIFactoryType(ServiceType)).ToNew(BindingHelper.CreateFactoryType(ImplementationType)).AsCached().OnResolve();
+            _container.Bind(BindingHelper.CreateIFactoryType(ServiceType)).ToNew(BindingHelper.CreateFactoryType(ImplementationType)).AsCached().OnRequest();
 
             return this;
         }
 
-        public void OnResolve()
+        public void OnRequest()
         {
-            Scope = BindingScope.OnResolve;
+            Scope = BindingScope.OnRequest;
 
             Complete();
         }

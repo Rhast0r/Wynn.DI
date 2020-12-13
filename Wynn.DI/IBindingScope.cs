@@ -7,6 +7,6 @@
 
     public interface IBindingScopeOnResolve
     {
-        void OnResolve();
+        void OnRequest();
     }
 }

@@ -10,7 +10,7 @@
     internal enum BindingScope
     {
         None = 0,
-        OnResolve = 1,
+        OnRequest = 1,
         OnInstall = 2,
     }
 }
