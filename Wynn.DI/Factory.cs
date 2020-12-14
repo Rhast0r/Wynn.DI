@@ -2,12 +2,7 @@
 
 namespace Wynn.DI
 {
-    public interface IFactory
-    {
-        object BaseCreate();
-    }
-
-    public interface IFactory<T> : IFactory
+    public interface IFactory<T>
     {
         T Create();
     }
@@ -20,11 +15,6 @@ namespace Wynn.DI
         public T Create()
         {
             return (T)_resolver.Get(typeof(T));
-        }
-
-        object IFactory.BaseCreate()
-        {
-            return Create();
         }
     }
 }
