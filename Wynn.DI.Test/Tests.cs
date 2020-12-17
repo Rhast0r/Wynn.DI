@@ -9,35 +9,35 @@ namespace Wynn.DI.Test
         [Fact]
         public void EmptyKernelBeingInstalledDoesNotThrow()
         {
-            var kernel = Container.Create();
+            var container = Container.Create();
 
-            kernel.Install();
+            var resolver = container.Install();
         }
 
         [Fact]
         public void EmptyKernelBeingValidatedDoesNotThrow()
         {
-            var kernel = Container.Create();
+            var container = Container.Create();
 
-            kernel.Validate();
-            kernel.Install();
+            container.Validate();
+            var resolver = container.Install();
         }
 
         [Fact]
         public void ResolvingClassWithConstructionArgumentsThrows()
         {
-            var kernel = Container.Create();
-            kernel.Bind<ConstructionArgumentNeeded>().ToNew().AsCached().OnInstall();
-            Assert.Throws<MissingMethodException>(() => kernel.Install());
+            var container = Container.Create();
+            container.Bind<ConstructionArgumentNeeded>().ToNew().AsCached().OnInstall();
+            Assert.Throws<MissingMethodException>(() => container.Install());
         }
 
         [Fact]
         public void InstallTriggersOnInstallResolution()
         {
             ResolutionAware.WasTriggered = false;
-            var kernel = Container.Create();
-            kernel.Bind<ResolutionAware>().ToNew().AsCached().OnInstall();
-            kernel.Install();
+            var container = Container.Create();
+            container.Bind<ResolutionAware>().ToNew().AsCached().OnInstall();
+            var resolver = container.Install();
 
             Assert.True(ResolutionAware.WasTriggered);
         }
@@ -47,9 +47,9 @@ namespace Wynn.DI.Test
         {
             ResolutionAware.WasTriggered = false;
 
-            var kernel = Container.Create();
-            kernel.Bind<ResolutionAware>().ToNew().AsCached().OnRequest();
-            kernel.Install();
+            var container = Container.Create();
+            container.Bind<ResolutionAware>().ToNew().AsCached().OnRequest();
+            var resolver = container.Install();
 
             Assert.False(ResolutionAware.WasTriggered);
         }
@@ -57,34 +57,34 @@ namespace Wynn.DI.Test
         [Fact]
         public void DependencylessClassResolves()
         {
-            var kernel = Container.Create();
-            kernel.Bind<EmptyClass>().ToNew().AsCached().OnRequest();
+            var container = Container.Create();
+            container.Bind<EmptyClass>().ToNew().AsCached().OnRequest();
 
-            kernel.Install();
+            var resolver = container.Install();
 
-            Assert.NotNull(kernel.Get<EmptyClass>());
+            Assert.NotNull(resolver.Get<EmptyClass>());
         }
 
         [Fact]
         public void DirectCircularDependencyThrows()
         {
-            var kernel = Container.Create();
-            kernel.Bind<DirectCircularDependency_A_To_B>().ToNew().AsCached().OnRequest();
-            kernel.Bind<DirectCircularDependency_B_To_A>().ToNew().AsCached().OnRequest();
+            var container = Container.Create();
+            container.Bind<DirectCircularDependency_A_To_B>().ToNew().AsCached().OnRequest();
+            container.Bind<DirectCircularDependency_B_To_A>().ToNew().AsCached().OnRequest();
 
-            var exception = Assert.Throws<InvalidOperationException>(() => kernel.Validate());
+            var exception = Assert.Throws<InvalidOperationException>(() => container.Validate());
             Assert.True(exception.Message == "circular dependency");
         }
 
         [Fact]
         public void IndirectCircularDependencyThrows()
         {
-            var kernel = Container.Create();
-            kernel.Bind<IndirectCircularDependency_A_To_B>().ToNew().AsCached().OnRequest();
-            kernel.Bind<IndirectCircularDependency_B_To_C>().ToNew().AsCached().OnRequest();
-            kernel.Bind<IndirectCircularDependency_C_To_A>().ToNew().AsCached().OnRequest();
+            var container = Container.Create();
+            container.Bind<IndirectCircularDependency_A_To_B>().ToNew().AsCached().OnRequest();
+            container.Bind<IndirectCircularDependency_B_To_C>().ToNew().AsCached().OnRequest();
+            container.Bind<IndirectCircularDependency_C_To_A>().ToNew().AsCached().OnRequest();
 
-            var exception = Assert.Throws<InvalidOperationException>(() => kernel.Validate());
+            var exception = Assert.Throws<InvalidOperationException>(() => container.Validate());
             Assert.True(exception.Message == "circular dependency");
         }
 
@@ -93,57 +93,57 @@ namespace Wynn.DI.Test
         {
             var empty = new EmptyClass();
 
-            var kernel = Container.Create();
-            kernel.Bind<EmptyClass>().ToConstant(empty).AsCached().OnInstall();
+            var container = Container.Create();
+            container.Bind<EmptyClass>().ToConstant(empty).AsCached().OnInstall();
 
-            kernel.Install();
+            var resolver = container.Install();
 
-            Assert.Equal(empty, kernel.Get<EmptyClass>());
+            Assert.Equal(empty, resolver.Get<EmptyClass>());
         }
 
         [Fact]
         public void AsCachedToNewReturnsSameObject()
         {
-            var kernel = Container.Create();
-            kernel.Bind<EmptyClass>().ToNew().AsCached().OnInstall();
+            var container = Container.Create();
+            container.Bind<EmptyClass>().ToNew().AsCached().OnInstall();
 
-            kernel.Install();
+            var resolver = container.Install();
 
-            var sameA = kernel.Get<EmptyClass>();
+            var sameA = resolver.Get<EmptyClass>();
 
-            Assert.Equal(kernel.Get<EmptyClass>(), kernel.Get<EmptyClass>());
+            Assert.Equal(resolver.Get<EmptyClass>(), resolver.Get<EmptyClass>());
         }
 
         [Fact]
         public void AsTransientReturnsDifferentObjectsFromResolve()
         {
-            var kernel = Container.Create();
-            kernel.Bind<EmptyClass>().ToNew().AsTransient().OnRequest();
+            var container = Container.Create();
+            container.Bind<EmptyClass>().ToNew().AsTransient().OnRequest();
 
-            kernel.Install();
-            Assert.NotEqual(kernel.Get<EmptyClass>(), kernel.Get<EmptyClass>());
+            var resolver = container.Install();
+            Assert.NotEqual(resolver.Get<EmptyClass>(), resolver.Get<EmptyClass>());
         }
 
         [Fact]
         public void AsTransientReturnsDifferentObjectsFromCreate()
         {
-            var kernel = Container.Create();
-            kernel.Bind<EmptyClass>().ToNew().AsTransient().OnRequest();
+            var container = Container.Create();
+            container.Bind<EmptyClass>().ToNew().AsTransient().OnRequest();
 
-            kernel.Install();
+            var resolver = container.Install();
 
-            var factory = kernel.Get<IFactory<EmptyClass>>();
+            var factory = resolver.Get<IFactory<EmptyClass>>();
             Assert.NotEqual(factory.Create(), factory.Create());
         }
 
         [Fact]
         public void AsCachedReturnsSameObjects()
         {
-            var kernel = Container.Create();
-            kernel.Bind<EmptyClass>().ToNew().AsCached().OnRequest();
+            var container = Container.Create();
+            container.Bind<EmptyClass>().ToNew().AsCached().OnRequest();
 
-            kernel.Install();
-            Assert.Equal(kernel.Get<EmptyClass>(), kernel.Get<EmptyClass>());
+            var resolver = container.Install();
+            Assert.Equal(resolver.Get<EmptyClass>(), resolver.Get<EmptyClass>());
         }
 
         [Fact]
@@ -152,13 +152,13 @@ namespace Wynn.DI.Test
             var eventCounter = new InjectEventCounter();
             var initializationAware = new InitializationAware();
 
-            var kernel = Container.Create();
-            kernel.Bind<InjectEventCounter>().ToConstant(eventCounter).AsCached().OnInstall();
-            kernel.Bind<InitializationAware>().ToConstant(initializationAware).AsCached().OnInstall();
+            var container = Container.Create();
+            container.Bind<InjectEventCounter>().ToConstant(eventCounter).AsCached().OnInstall();
+            container.Bind<InitializationAware>().ToConstant(initializationAware).AsCached().OnInstall();
 
             Assert.Equal(0, eventCounter.Initialize);
 
-            kernel.Install();
+            var resolver = container.Install();
 
             Assert.Equal(1, eventCounter.Initialize);
         }
@@ -169,17 +169,17 @@ namespace Wynn.DI.Test
             var eventCounter = new InjectEventCounter();
             var initializationAware = new InitializationAware();
 
-            var kernel = Container.Create();
-            kernel.Bind<InjectEventCounter>().ToConstant(eventCounter).AsCached().OnInstall();
-            kernel.Bind<InitializationAware>().ToConstant(initializationAware).AsCached().OnRequest();
+            var container = Container.Create();
+            container.Bind<InjectEventCounter>().ToConstant(eventCounter).AsCached().OnInstall();
+            container.Bind<InitializationAware>().ToConstant(initializationAware).AsCached().OnRequest();
 
             Assert.Equal(0, eventCounter.Initialize);
 
-            kernel.Install();
+            var resolver = container.Install();
 
             Assert.Equal(0, eventCounter.Initialize);
 
-            var initializationAware2 = kernel.Get<InitializationAware>();
+            var initializationAware2 = resolver.Get<InitializationAware>();
 
             Assert.Equal(1, eventCounter.Initialize);
         }
@@ -189,13 +189,13 @@ namespace Wynn.DI.Test
         {
             var eventCounter = new InjectEventCounter();
 
-            var kernel = Container.Create();
-            kernel.Bind<InjectEventCounter>().ToConstant(eventCounter).AsCached().OnInstall();
-            kernel.Bind<InitializationAware>().ToNew().AsCached().OnInstall();
+            var container = Container.Create();
+            container.Bind<InjectEventCounter>().ToConstant(eventCounter).AsCached().OnInstall();
+            container.Bind<InitializationAware>().ToNew().AsCached().OnInstall();
 
             Assert.Equal(0, eventCounter.Initialize);
 
-            kernel.Install();
+            var resolver = container.Install();
 
             Assert.Equal(1, eventCounter.Initialize);
         }
@@ -205,17 +205,17 @@ namespace Wynn.DI.Test
         {
             var eventCounter = new InjectEventCounter();
 
-            var kernel = Container.Create();
-            kernel.Bind<InjectEventCounter>().ToConstant(eventCounter).AsCached().OnInstall();
-            kernel.Bind<InitializationAware>().ToNew().AsCached().OnRequest();
+            var container = Container.Create();
+            container.Bind<InjectEventCounter>().ToConstant(eventCounter).AsCached().OnInstall();
+            container.Bind<InitializationAware>().ToNew().AsCached().OnRequest();
 
             Assert.Equal(0, eventCounter.Initialize);
 
-            kernel.Install();
+            var resolver = container.Install();
 
             Assert.Equal(0, eventCounter.Initialize);
 
-            var initializationAware = kernel.Get<InitializationAware>();
+            var initializationAware = resolver.Get<InitializationAware>();
 
             Assert.Equal(1, eventCounter.Initialize);
         }
@@ -225,15 +225,15 @@ namespace Wynn.DI.Test
         {
             var eventCounter = new InjectEventCounter();
 
-            var kernel = Container.Create();
-            kernel.Bind<InjectEventCounter>().ToConstant(eventCounter).AsCached().OnInstall();
-            kernel.Bind<InitializationAware>().ToNew().AsTransient().OnRequest();
+            var container = Container.Create();
+            container.Bind<InjectEventCounter>().ToConstant(eventCounter).AsCached().OnInstall();
+            container.Bind<InitializationAware>().ToNew().AsTransient().OnRequest();
 
-            kernel.Install();
+            var resolver = container.Install();
 
             Assert.Equal(0, eventCounter.Initialize);
 
-            var factory = kernel.Get<IFactory<InitializationAware>>();
+            var factory = resolver.Get<IFactory<InitializationAware>>();
 
             Assert.Equal(0, eventCounter.Initialize);
 
@@ -247,34 +247,15 @@ namespace Wynn.DI.Test
         {
             var eventCounter = new InjectEventCounter();
 
-            var kernel = Container.Create();
-            kernel.Bind<InjectEventCounter>().ToConstant(eventCounter).AsCached().OnInstall();
-            kernel.Bind<InitializationAware>().ToNew().AsTransient().OnRequest();
+            var container = Container.Create();
+            container.Bind<InjectEventCounter>().ToConstant(eventCounter).AsCached().OnInstall();
+            container.Bind<InitializationAware>().ToNew().AsTransient().OnRequest();
 
-            kernel.Install();
-
-            Assert.Equal(0, eventCounter.Initialize);
-
-            var initializationAware = kernel.Get<InitializationAware>();
-
-            Assert.Equal(1, eventCounter.Initialize);
-        }
-
-        [Fact]
-        public void InitializeIsCalledOnInject()
-        {
-            var eventCounter = new InjectEventCounter();
-
-            var kernel = Container.Create();
-            kernel.Bind<InjectEventCounter>().ToConstant(eventCounter).AsCached().OnInstall();
-
-            kernel.Install();
-
-            var initializationAware = new InitializationAware();
+            var resolver = container.Install();
 
             Assert.Equal(0, eventCounter.Initialize);
 
-            kernel.Inject(initializationAware);
+            var initializationAware = resolver.Get<InitializationAware>();
 
             Assert.Equal(1, eventCounter.Initialize);
         }
@@ -282,42 +263,42 @@ namespace Wynn.DI.Test
         [Fact]
         public void GetAsCachedResolves()
         {
-            var kernel = Container.Create();
-            kernel.Bind<EmptyClass>().ToNew().AsCached().OnInstall();
-            kernel.Install();
+            var container = Container.Create();
+            container.Bind<EmptyClass>().ToNew().AsCached().OnInstall();
+            var resolver = container.Install();
 
-            var empty = kernel.Get<EmptyClass>();
+            var empty = resolver.Get<EmptyClass>();
         }
 
         [Fact]
         public void GetAsTransientResolves()
         {
-            var kernel = Container.Create();
-            kernel.Bind<EmptyClass>().ToNew().AsTransient().OnRequest();
-            kernel.Install();
+            var container = Container.Create();
+            container.Bind<EmptyClass>().ToNew().AsTransient().OnRequest();
+            var resolver = container.Install();
 
-            var empty = kernel.Get<EmptyClass>();
+            var empty = resolver.Get<EmptyClass>();
         }
 
         [Fact]
         public void GetAsTransientResolveFactoryType()
         {
-            var kernel = Container.Create();
-            kernel.Bind<EmptyClass>().ToNew().AsTransient().OnRequest();
-            kernel.Install();
+            var container = Container.Create();
+            container.Bind<EmptyClass>().ToNew().AsTransient().OnRequest();
+            var resolver = container.Install();
 
-            var emptyFactory = kernel.Get<IFactory<EmptyClass>>();
+            var emptyFactory = resolver.Get<IFactory<EmptyClass>>();
         }
 
         [Fact]
         public void InjectFillsField()
         {
-            var kernel = Container.Create();
-            kernel.Bind<EmptyClass>().ToNew().AsCached().OnRequest();
-            kernel.Install();
+            var container = Container.Create();
+            container.Bind<EmptyClass>().ToNew().AsCached().OnRequest();
+            var resolver = container.Install();
 
             var unknownClass = new UnknownClass();
-            kernel.Inject(unknownClass);
+            resolver.Inject(unknownClass);
 
             Assert.True(unknownClass.Empty != null);
         }
@@ -325,12 +306,12 @@ namespace Wynn.DI.Test
         [Fact]
         public void InjectThrowsOnUnknownDependency()
         {
-            var kernel = Container.Create();
-            kernel.Install();
+            var container = Container.Create();
+            var resolver = container.Install();
 
             var unknownClass = new UnknownClass();
 
-            var exception = Assert.Throws<System.Collections.Generic.KeyNotFoundException>(() => kernel.Inject(unknownClass));
+            var exception = Assert.Throws<System.Collections.Generic.KeyNotFoundException>(() => resolver.Inject(unknownClass));
         }
     }
 

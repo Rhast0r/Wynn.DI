@@ -28,12 +28,13 @@ namespace Wynn.DI
             return new Binding(this);
         }
 
-        public void Install()
+        public IContainerResolver Install()
         {
             ThrowIfInstalled();
             _isInstalled = true;
 
             EnsureBindingsResolved(Cache.GetBindings().Where(x => x.Scope == BindingScope.OnInstall));
+            return this;
         }
 
         private void EnsureBindingsResolved(IEnumerable<Binding> bindings)
@@ -170,8 +171,21 @@ namespace Wynn.DI
             EnsureBindingsResolved(Cache.GetBindings());
         }
 
-        public T Get<T>() => (T)Get(typeof(T));
-        public object Get(Type serviceType)
+        T IContainerResolver.Get<T>() => (T)GetCore(typeof(T));
+        object IContainerResolver.Get(Type serviceType) => GetCore(serviceType); 
+
+        void IContainerResolver.Inject(object obj)
+        {
+            if (obj == null)
+                throw new ArgumentNullException(nameof(obj));
+
+            // Note: The injectee could be unknow to the container and therefor no binding might exist hence we just resolve the bindings it might have
+            EnsureBindingsResolved(Cache.GetDependencies(obj.GetType()).Select(x => Cache.GetBinding(x)));
+
+            InternalInject(obj);
+        }
+
+        private object GetCore(Type serviceType)
         {
             ThrowIfNotInstalled();
 
@@ -189,19 +203,6 @@ namespace Wynn.DI
             {
                 throw new InvalidOperationException();
             }
-        }
-
-        public void Inject(object obj)
-        {
-            if (obj == null)
-                throw new ArgumentNullException(nameof(obj));
-
-            // Note: The injectee could be unknow to the container and therefor no binding might exist hence we just resolve the bindings it might have
-            EnsureBindingsResolved(Cache.GetDependencies(obj.GetType()).Select(x => Cache.GetBinding(x)));
-
-            InternalInject(obj);
-
-            (obj as IInitialize)?.Initialize();
         }
 
         private void InternalInject(object obj)
