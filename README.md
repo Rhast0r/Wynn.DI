@@ -2,7 +2,7 @@
 
 **Wynn.DI** is a lightweight Dependency Injection-Framework helping you to accelerate the development of your application whilst still being easy to maintain and test.
 
-## Overview
+## Goals
 - **Simple** - Easy to use fluent-API can be picked up quickly
 - **Safe** - Additional validation features help you to detect errors early before you start shipping
 - **Strict** - Enforces code to be written in a certain way improving maintainability and reducing side-effects
@@ -15,7 +15,7 @@
 - Safe Post-Creation callbacks
 - Validation
 
-## Getting started
+## Overview
 
 ### Implementation Type 
  | Method | Definition | Implications |
@@ -42,8 +42,7 @@
  | `.OnInstall()` | The binding will we resolved as soon as the container is installed |  |
  | `.OnRequest()` | The binding will we resolved when explicitly requested with `.Get(...)` or `.Get<T>()` or implicitly when another resolved binding has a dependency on service type |  |
  
-
-### Examples
+## Examples
 
 ```csharp
 public interface IFoo { }
