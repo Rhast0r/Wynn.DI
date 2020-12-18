@@ -39,9 +39,8 @@ namespace Wynn.DI
 
         private void EnsureBindingsResolved(IEnumerable<Binding> bindings)
         {
-            var visitedBindings = new HashSet<Binding>();
             foreach (var binding in bindings)
-                EnsureBindingResolved(binding, visitedBindings);
+                EnsureBindingResolved(binding);
         }
 
         internal object GetObject(Binding binding)
@@ -68,7 +67,7 @@ namespace Wynn.DI
             _bindingToObject.Add(binding, obj);
         }
 
-        private void EnsureBindingResolved(Binding binding, HashSet<Binding> visitedBindings)
+        private void EnsureBindingResolved(Binding binding, HashSet<Binding> visitedBindings = null)
         {
             if (binding.Resolution == BindingResolution.AsCached && HasObject(binding))
                 return;
@@ -164,9 +163,8 @@ namespace Wynn.DI
             foreach (var binding in Cache.GetBindings())
                 CheckCircularDependencies(binding);
 
-            var visitedBindings = new HashSet<Binding>();
             foreach (var binding in Cache.GetBindings().Where(x => x.Scope == BindingScope.OnInstall))
-                EnsureBindingResolved(binding, visitedBindings);
+                EnsureBindingResolved(binding);
 
             EnsureBindingsResolved(Cache.GetBindings());
         }
@@ -190,7 +188,7 @@ namespace Wynn.DI
             ThrowIfNotInstalled();
 
             var binding = Cache.GetBinding(serviceType);
-            EnsureBindingResolved(binding, null);
+            EnsureBindingResolved(binding);
             if (binding.Resolution == BindingResolution.AsCached)
             {
                 return GetObject(binding);
