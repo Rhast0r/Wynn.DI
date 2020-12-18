@@ -24,6 +24,30 @@ namespace Wynn.DI.Test
         }
 
         [Fact]
+        public void ValidateThrowsWhenDependecyIsMissingAsCached()
+        {
+            var container = Container.Create();
+
+            container.Bind<DependencyMissingClass>().ToNew().AsCached().OnRequest();
+
+            Assert.Throws<InvalidOperationException>(() => container.Validate());
+
+            var resolver = container.Install();
+        }
+
+        [Fact]
+        public void ValidateThrowsWhenDependecyIsMissingAsTransient()
+        {
+            var container = Container.Create();
+
+            container.Bind<DependencyMissingClass>().ToNew().AsTransient().OnRequest();
+
+            Assert.Throws<InvalidOperationException>(() => container.Validate());
+
+            var resolver = container.Install();
+        }
+
+        [Fact]
         public void ResolvingClassWithConstructionArgumentsThrows()
         {
             var container = Container.Create();
@@ -352,6 +376,12 @@ namespace Wynn.DI.Test
 
     public sealed class EmptyClass
     {
+    }
+
+    public sealed class DependencyMissingClass
+    {
+        [Inject]
+        private readonly object _object = null; 
     }
 
     public sealed class ConstructionArgumentNeeded
