@@ -14,6 +14,8 @@ namespace Wynn.DI
 
         public static Container Create() => new Container();
 
+        internal Binding CurrentBinding { get; set; }
+
         private Container()
         {
             _bindingToObject = new Dictionary<Binding, object>();
@@ -24,13 +26,18 @@ namespace Wynn.DI
         private IBindingService CreateBinding()
         {
             ThrowIfInstalled();
+            ThrowIfHasPendingBinding();
 
-            return new Binding(this);
+            var binding = new Binding(this);
+            CurrentBinding = binding;
+            return binding;
         }
 
         public IContainerResolver Install()
         {
             ThrowIfInstalled();
+            ThrowIfHasPendingBinding(); 
+
             _isInstalled = true;
 
             EnsureBindingsResolved(Cache.GetBindings().Where(x => x.Scope == BindingScope.OnInstall));
@@ -150,6 +157,18 @@ namespace Wynn.DI
                 throw new InvalidOperationException("for this operation the kernel must have been installed");
         }
 
+        internal void ThrowIfHasPendingBinding()
+        {
+            if (CurrentBinding != null)
+                throw new InvalidOperationException("assure pending binding have been completed");
+        }
+
+        internal void ThrowIfHasNoPendingBinding()
+        {
+            if (CurrentBinding == null)
+                throw new InvalidOperationException();
+        }
+
         public void Validate()
         {
             ThrowIfInstalled();
@@ -223,8 +242,11 @@ namespace Wynn.DI
         internal void InternalAddBinding(Binding binding)
         {
             ThrowIfInstalled();
+            ThrowIfHasNoPendingBinding(); 
 
             Cache.AddBinding(binding);
+
+            CurrentBinding = null; 
         }
 
         public IBindingImplementation Bind<T>()

@@ -118,7 +118,15 @@ namespace Wynn.DI
         public IBindingScopeOnResolve AsTransient()
         {
             Resolution = BindingResolution.AsTransient;
+
+            var currentBinding = _container.CurrentBinding;
+            
+            _container.ThrowIfHasNoPendingBinding();
+            _container.CurrentBinding = null;
             _container.Bind(BindingHelper.CreateIFactoryType(ServiceType)).ToNew(BindingHelper.CreateFactoryType(ImplementationType)).AsCached().OnRequest();
+            _container.ThrowIfHasPendingBinding();
+
+            _container.CurrentBinding = currentBinding;
 
             return this;
         }

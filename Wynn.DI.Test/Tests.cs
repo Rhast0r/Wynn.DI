@@ -171,6 +171,30 @@ namespace Wynn.DI.Test
         }
 
         [Fact]
+        public void CreatingAnotherBindingWhilstAnotherIsPendingThrows()
+        {
+            var container = Container.Create();
+            container.Bind<EmptyClass>();
+            Assert.Throws<InvalidOperationException>(() => container.Bind<object>());
+        }
+
+        [Fact]
+        public void InstallingWhilstBindingIsPendingThrows()
+        {
+            var container = Container.Create();
+            container.Bind<EmptyClass>();
+            Assert.Throws<InvalidOperationException>(() => container.Install());
+        }
+
+        [Fact]
+        public void CreatingDuplicateBindingThrows()
+        {
+            var container = Container.Create();
+            container.Bind<EmptyClass>().ToNew().AsCached().OnInstall();
+            Assert.Throws<ArgumentException>(() => container.Bind<EmptyClass>().ToNew().AsCached().OnInstall());
+        }
+
+        [Fact]
         public void InitializeToConstantIsCalledOnInstall()
         {
             var eventCounter = new InjectEventCounter();
