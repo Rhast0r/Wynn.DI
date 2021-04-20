@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Wynn.DI
+namespace Wynn.DI    
 {
     internal class Binding : IBindingService, IBindingImplementation, IBindingResolution, IBindingScope
     {

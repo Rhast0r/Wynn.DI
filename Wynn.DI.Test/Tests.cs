@@ -451,14 +451,4 @@ namespace Wynn.DI.Test
         [Inject]
         internal readonly IndirectCircularDependency_A_To_B _indirectCircularDependency_A_To_B = null;
     }
-
-    public static class TestExtension
-    {
-        public static void StrongDispose(ref this IDisposable disposable)
-        {
-            disposable.Dispose();
-            disposable = null;
-        }
-
-    }
 }
