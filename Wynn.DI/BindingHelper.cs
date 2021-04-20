@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Wynn.DI
 {
-    internal static class BindingHelper
+    public static class BindingHelper
     {
         internal static IEnumerable<FieldInfo> GetInjectableFields(Type type)
         {
@@ -50,7 +50,7 @@ namespace Wynn.DI
             return typeof(Factory<>).MakeGenericType(new[] { type });
         }
 
-        internal static IEnumerable<FieldInfo> GetAllFields(Type type)
+        public static IEnumerable<FieldInfo> GetAllFields(Type type)
         {
             var currentType = type;
 

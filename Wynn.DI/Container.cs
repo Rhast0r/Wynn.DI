@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Wynn.DI
@@ -36,7 +35,7 @@ namespace Wynn.DI
         public IContainerResolver Install()
         {
             ThrowIfInstalled();
-            ThrowIfHasPendingBinding(); 
+            ThrowIfHasPendingBinding();
 
             _isInstalled = true;
 
@@ -189,7 +188,7 @@ namespace Wynn.DI
         }
 
         T IContainerResolver.Get<T>() => (T)GetCore(typeof(T));
-        object IContainerResolver.Get(Type serviceType) => GetCore(serviceType); 
+        object IContainerResolver.Get(Type serviceType) => GetCore(serviceType);
 
         void IContainerResolver.Inject(object obj)
         {
@@ -242,11 +241,11 @@ namespace Wynn.DI
         internal void InternalAddBinding(Binding binding)
         {
             ThrowIfInstalled();
-            ThrowIfHasNoPendingBinding(); 
+            ThrowIfHasNoPendingBinding();
 
             Cache.AddBinding(binding);
 
-            CurrentBinding = null; 
+            CurrentBinding = null;
         }
 
         public IBindingImplementation Bind<T>()

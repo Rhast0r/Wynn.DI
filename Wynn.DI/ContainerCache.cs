@@ -15,7 +15,7 @@ namespace Wynn.DI
         {
             _bindingToDirectDependantBindings = new Dictionary<Binding, IReadOnlyCollection<Binding>>();
             _typeToBinding = new Dictionary<Type, Binding>();
-        
+
             _typeToFields = new Dictionary<Type, IEnumerable<FieldInfo>>();
         }
 

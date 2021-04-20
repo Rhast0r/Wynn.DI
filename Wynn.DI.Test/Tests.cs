@@ -1,5 +1,4 @@
-﻿using Wynn.DI;
-using System;
+﻿using System;
 using Xunit;
 
 namespace Wynn.DI.Test
@@ -405,7 +404,7 @@ namespace Wynn.DI.Test
     public sealed class DependencyMissingClass
     {
         [Inject]
-        private readonly object _object = null; 
+        private readonly object _object = null;
     }
 
     public sealed class ConstructionArgumentNeeded
@@ -451,5 +450,15 @@ namespace Wynn.DI.Test
 
         [Inject]
         internal readonly IndirectCircularDependency_A_To_B _indirectCircularDependency_A_To_B = null;
+    }
+
+    public static class TestExtension
+    {
+        public static void StrongDispose(ref this IDisposable disposable)
+        {
+            disposable.Dispose();
+            disposable = null;
+        }
+
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Wynn.DI
+﻿namespace Wynn.DI
 {
     public interface IFactory<T>
     {

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Wynn.DI
 {
@@ -70,7 +68,7 @@ namespace Wynn.DI
                 throw new ArgumentNullException(nameof(implementationType));
 
             ValidateImplementationType(implementationType);
-            ImplementationType = implementationType; 
+            ImplementationType = implementationType;
 
             CreationMethod = (resolver) =>
             {
@@ -98,7 +96,7 @@ namespace Wynn.DI
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            var implementationType = value.GetType(); 
+            var implementationType = value.GetType();
             ValidateImplementationType(implementationType);
             ImplementationType = implementationType;
 
@@ -120,7 +118,7 @@ namespace Wynn.DI
             Resolution = BindingResolution.AsTransient;
 
             var currentBinding = _container.CurrentBinding;
-            
+
             _container.ThrowIfHasNoPendingBinding();
             _container.CurrentBinding = null;
             _container.Bind(BindingHelper.CreateIFactoryType(ServiceType)).ToNew(BindingHelper.CreateFactoryType(ImplementationType)).AsCached().OnRequest();
